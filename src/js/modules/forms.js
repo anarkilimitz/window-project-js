@@ -1,13 +1,10 @@
-const forms = () => {
-	const form = document.querySelectorAll('form'),
-		inputs = document.querySelectorAll('input'),
-		phoneInputs = document.querySelectorAll('input[name="user_phone"]');
+import checkNumInputs from './checkNumInputs';
 
-	phoneInputs.forEach((item) => {
-		item.addEventListener('input', () => {
-			item.value = item.value.replace(/\D/, '');
-		});
-	});
+const forms = (state) => {
+	const form = document.querySelectorAll('form'),
+		inputs = document.querySelectorAll('input');
+
+	checkNumInputs('input[name="user_phone"]'); // валидация инпутов на число
 
 	const message = {
 		loading: 'Загрузка...',
@@ -38,8 +35,13 @@ const forms = () => {
 			let statusMessage = document.createElement('div');
 			statusMessage.classList.add('status');
 			item.appendChild(statusMessage);
-
+			// проверка что это именно модалка из калькулятора окон
 			const formData = new FormData(item);
+			if (item.getAttribute('data-calc') === 'end') {
+				for (let key in state) {
+					formData.append(key, state[key]);
+				}
+			}
 
 			postData('assets/server.php', formData)
 				.then((res) => {
@@ -49,9 +51,22 @@ const forms = () => {
 				.catch(() => (statusMessage.textContent = message.failure))
 				.finally(() => {
 					clearInputs();
+					// закрыть именно модалку КАЛЬКУЛЯТОР после отправки
+					if (item.getAttribute('data-calc') === 'end') {
+						setTimeout(() => {
+							const modal = document.querySelector('.popup_calc_end');
+							modal.style.display = 'none';
+							document.body.style.overflow = '';
+
+							// закрть все остальные модалки на всякий случай
+							document.querySelectorAll('[data-modal]').forEach((win) => {
+								win.style.display = 'none';
+							});
+						}, 2500);
+					}
 					setTimeout(() => {
 						statusMessage.remove();
-					}, 3000);
+					}, 1800);
 				});
 		});
 	});
