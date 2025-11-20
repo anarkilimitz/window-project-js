@@ -1095,6 +1095,16 @@ textarea:focus {
   padding: 1rem 5rem;
 }
 
+/* доп стили popup img для адаптации картинок галереи */
+
+.popup img {
+  max-width: 90%;
+  max-height: 90%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
 /*Media*/
 @media (max-width: 1400px) {
   .main {
